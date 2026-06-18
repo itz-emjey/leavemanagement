@@ -37,6 +37,8 @@ RUN rm -rf /usr/share/nginx/html/index.html.nginx-default 2>/dev/null || true
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
 
+EXPOSE 80
+
 # Use envsubst to inject environment variables into nginx.conf
 # We use a template file and output to the final location
 CMD ["/bin/sh", "-c", "export BACKEND_URL=${BACKEND_URL:-http://backend:5000} && envsubst '${BACKEND_URL}' < /etc/nginx/conf.d/default.conf > /etc/nginx/conf.d/default.conf.tmp && mv /etc/nginx/conf.d/default.conf.tmp /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
