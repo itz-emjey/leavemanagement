@@ -9,6 +9,8 @@
     "start": "node dist/server.js",
     "seed": "ts-node src/seeders/seed.ts",
     "migrate": "ts-node src/config/migrate.ts",
+    "seed:prod": "node dist/seeders/seed.js",
+    "migrate:prod": "node dist/config/migrate.js",
     "migration:status": "ts-node -e \"import('./src/config/migrationRunner').then(m => m.migrationStatus())\"",
     "test": "jest",
     "test:watch": "jest --watch",

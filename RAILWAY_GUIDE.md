@@ -64,7 +64,7 @@ Since this is your first time deploying, your database is empty. You need to cre
 2. Go to the **Settings** tab.
 3. Find the **Deploy** section and look for **Start Command**.
 4. Change the Start Command temporarily to:
-   - `npm run migrate && npm run seed && npm start`
+   - `npm run migrate:prod && npm run seed:prod && npm start`
 5. Click **Save**. Railway will restart.
 6. Once it says "Seeding complete!" in the logs, change it back to just:
    - `npm start`

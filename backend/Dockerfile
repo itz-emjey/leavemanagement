@@ -17,7 +17,7 @@ COPY tsconfig.json ./
 COPY src/ ./src/
 
 # Build TypeScript
-RUN npm run build
+RUN npm run build && cp -r src/migrations dist/migrations
 
 # Prune dev dependencies for smaller production image
 RUN npm ci --production && npm cache clean --force
