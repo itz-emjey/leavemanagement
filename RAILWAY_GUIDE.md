@@ -56,7 +56,34 @@ Ensure each service looks at the correct folder in your GitHub repo:
 
 ---
 
-## Summary of Changes
+## 5. Initialize the Database
+Since this is your first time deploying, your database is empty. You need to create the tables and add some initial data (admin user, leave types).
+
+**What to do:**
+1. Go to your **Backend Service** in Railway.
+2. Go to the **Settings** tab.
+3. Find the **Deploy** section and look for **Start Command**.
+4. Change the Start Command temporarily to:
+   - `npm run migrate && npm run seed && npm start`
+5. Click **Save**. Railway will restart.
+6. Once it says "Seeding complete!" in the logs, change it back to just:
+   - `npm start`
+   - (This prevents it from trying to seed every time you restart).
+
+---
+
+## 6. How to Open the App
+1. Go to your **Frontend Service** in Railway.
+2. Find the URL under **Public Networking** (e.g., `https://frontend-production-xxxx.up.railway.app`).
+3. Click it to open the app!
+
+**Default Credentials:**
+- **Email:** `admin@company.com`
+- **Password:** `admin123`
+
+---
+
+## 7. Summary of Changes
 I have already updated your code to:
 - ✅ **Prevent `index.js` missing error**: Fixed the root `package.json`.
 - ✅ **Support `DATABASE_URL`**: The backend now automatically detects Railway's MySQL.

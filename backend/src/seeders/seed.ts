@@ -9,8 +9,8 @@ const seed = async () => {
     await sequelize.authenticate();
     logger.info('Database connected.');
 
-    await sequelize.sync({ force: true });
-    logger.info('Tables recreated.');
+    await sequelize.sync({ alter: true });
+    logger.info('Tables synced.');
 
     // Roles
     const roles = await Role.bulkCreate([
