@@ -2,30 +2,43 @@ import { Sequelize } from 'sequelize';
 import config from './constants';
 import { logger } from '../utils/logger';
 
-const sequelize = new Sequelize(config.db.name, config.db.user, config.db.password, {
-  host: config.db.host,
-  port: config.db.port,
-  dialect: 'mysql',
-  logging: config.nodeEnv === 'development'
-    ? (sql: string, timing?: number) => {
-        logger.debug('SQL Query', {
-          query: sql.substring(0, 500), // Truncate long queries
-          duration: timing ? `${timing}ms` : undefined,
-          db: config.db.name,
-        });
-      }
-    : false,
-  define: {
-    timestamps: true,
-    underscored: false,
-  },
-  pool: {
-    max: 10,
-    min: 0,
-    acquire: 30000,
-    idle: 10000,
-  },
-});
+const sequelize = config.databaseUrl
+  ? new Sequelize(config.databaseUrl, {
+      dialect: 'mysql',
+      logging: config.nodeEnv === 'development'
+        ? (sql: string, timing?: number) => {
+            logger.debug('SQL Query', {
+              query: sql.substring(0, 500),
+              duration: timing ? `${timing}ms` : undefined,
+              db: 'remote',
+            });
+          }
+        : false,
+    })
+  : new Sequelize(config.db.name, config.db.user, config.db.password, {
+      host: config.db.host,
+      port: config.db.port,
+      dialect: 'mysql',
+      logging: config.nodeEnv === 'development'
+        ? (sql: string, timing?: number) => {
+            logger.debug('SQL Query', {
+              query: sql.substring(0, 500),
+              duration: timing ? `${timing}ms` : undefined,
+              db: config.db.name,
+            });
+          }
+        : false,
+      define: {
+        timestamps: true,
+        underscored: false,
+      },
+      pool: {
+        max: 10,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+    });
 
 export default sequelize;
 

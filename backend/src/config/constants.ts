@@ -12,17 +12,18 @@ function requireEnv(name: string): string {
 export default {
   port: parseInt(process.env.PORT || '5000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
+  databaseUrl: process.env.DATABASE_URL, // Support connection string
   db: {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
     name: process.env.DB_NAME || 'leave_management',
     user: process.env.DB_USER || 'root',
     password: process.env.NODE_ENV === 'production'
-      ? requireEnv('DB_PASSWORD')
+      ? (process.env.DB_PASSWORD || '') // Don't throw here, let Sequelize handle it if connection string is missing
       : (process.env.DB_PASSWORD || ''),
   },
   jwt: {
-    secret: requireEnv('JWT_SECRET'),
+    secret: process.env.JWT_SECRET || 'dev-secret-change-me-in-production',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
   upload: {
