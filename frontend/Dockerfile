@@ -24,6 +24,9 @@ RUN npm run build
 # ── Stage 2: nginx serve ──────────────────────────────────
 FROM nginx:1.27-alpine AS production
 
+# Default fallback to prevent crash if variable is missing
+ENV BACKEND_URL=http://localhost:5000
+
 # Copy nginx configuration as a template (official nginx image will automatically envsubst it)
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
