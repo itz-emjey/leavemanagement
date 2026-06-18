@@ -1,0 +1,130 @@
+import { Response } from 'express';
+import { LeaveType, AuditLog } from '../models';
+import { AuthRequest } from '../middleware/auth';
+import { cacheGet, cacheSet, cacheDelete } from '../utils/cache';
+import { logger } from '../utils/logger';
+
+// GET /api/leave-types
+export const getLeaveTypes = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const cached = cacheGet<any[]>('leave_types');
+    if (cached) {
+      res.json(cached);
+      return;
+    }
+    const leaveTypes = await LeaveType.findAll({
+      order: [['name', 'ASC']],
+    });
+    cacheSet('leave_types', leaveTypes, 600); // 10 min TTL
+    res.json(leaveTypes);
+  } catch (error) {
+    logger.error('Get leave types error:', { error: (error as Error).message });
+    res.status(500).json({ message: 'Failed to fetch leave types.' });
+  }
+};
+
+// POST /api/leave-types
+export const createLeaveType = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { name, description, defaultDays, color } = req.body;
+
+    if (!name || defaultDays === undefined) {
+      res.status(400).json({ message: 'Name and defaultDays are required.' });
+      return;
+    }
+
+    const existing = await LeaveType.findOne({ where: { name } });
+    if (existing) {
+      res.status(400).json({ message: 'Leave type already exists.' });
+      return;
+    }
+
+    const leaveType = await LeaveType.create({
+      name,
+      description: description || '',
+      defaultDays,
+      color: color || '#5B5FEF',
+    });
+
+    await AuditLog.create({
+      userId: req.user!.userId,
+      action: 'create',
+      entity: 'leave_type',
+      entityId: leaveType.id,
+      details: `Created leave type "${name}" with ${defaultDays} default days`,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
+      cacheDelete('leave_types');
+    res.status(201).json(leaveType);
+  } catch (error) {
+    logger.error('Create leave type error:', { error: (error as Error).message });
+    res.status(500).json({ message: 'Failed to create leave type.' });
+  }
+};
+
+// PUT /api/leave-types/:id
+export const updateLeaveType = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const leaveType = await LeaveType.findByPk(req.params.id);
+    if (!leaveType) {
+      res.status(404).json({ message: 'Leave type not found.' });
+      return;
+    }
+
+    const { name, description, defaultDays, color } = req.body;
+    await leaveType.update({
+      name: name || leaveType.name,
+      description: description !== undefined ? description : leaveType.description,
+      defaultDays: defaultDays !== undefined ? defaultDays : leaveType.defaultDays,
+      color: color || leaveType.color,
+    });
+
+    await AuditLog.create({
+      userId: req.user!.userId,
+      action: 'update',
+      entity: 'leave_type',
+      entityId: leaveType.id,
+      details: `Updated leave type "${leaveType.name}"`,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
+    cacheDelete('leave_types');
+    res.json(leaveType);
+  } catch (error) {
+    logger.error('Update leave type error:', { error: (error as Error).message });
+    res.status(500).json({ message: 'Failed to update leave type.' });
+  }
+};
+
+// DELETE /api/leave-types/:id
+export const deleteLeaveType = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const leaveType = await LeaveType.findByPk(req.params.id);
+    if (!leaveType) {
+      res.status(404).json({ message: 'Leave type not found.' });
+      return;
+    }
+
+    const name = leaveType.name;
+    await leaveType.destroy();
+
+    await AuditLog.create({
+      userId: req.user!.userId,
+      action: 'delete',
+      entity: 'leave_type',
+      entityId: parseInt(req.params.id),
+      details: `Deleted leave type "${name}"`,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
+    cacheDelete('leave_types');
+    res.json({ message: 'Leave type deleted successfully.' });
+  } catch (error) {
+    logger.error('Delete leave type error:', { error: (error as Error).message });
+    res.status(500).json({ message: 'Failed to delete leave type.' });
+  }
+};
