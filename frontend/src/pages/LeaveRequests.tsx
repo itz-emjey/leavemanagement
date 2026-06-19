@@ -5,7 +5,7 @@ import { Search, Filter, CheckCircle, XCircle, Eye, Printer, FileText, AlertTria
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { SkeletonTable } from '@/components/Skeleton';
-
+import LeavePrintForm from '@/components/LeavePrintForm';
 interface LeaveRequest {
   id: number;
   employeeId: number;
@@ -130,129 +130,10 @@ export default function LeaveRequests() {
   };
 
   const handlePrint = (req: LeaveRequest) => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Leave Application - ${req.employee?.firstName} ${req.employee?.lastName}</title>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Great+Vibes&display=swap');
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            padding: 40px;
-            color: #1a1a2e;
-            background: white;
-          }
-          .header {
-            text-align: center;
-            padding-bottom: 24px;
-            border-bottom: 2px solid #5B5FEF;
-            margin-bottom: 32px;
-          }
-          .header h1 { font-size: 22px; color: #5B5FEF; margin-bottom: 4px; }
-          .header p { color: #64748b; font-size: 13px; }
-          .section { margin-bottom: 24px; }
-          .section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 12px; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-          .field label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 2px; }
-          .field p { font-size: 14px; color: #1a1a2e; font-weight: 500; }
-          .status-badge {
-            display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
-          }
-          .status-approved { background: #dcfce7; color: #166534; }
-          .status-pending { background: #fef3c7; color: #92400e; }
-          .status-rejected { background: #fee2e2; color: #991b1b; }
-          .reason-box {
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 8px;
-          }
-          .footer {
-            margin-top: 40px; padding-top: 16px; border-top: 1px solid #e2e8f0;
-            font-size: 11px; color: #94a3b8; text-align: center;
-          }
-          @media print {
-            body { padding: 20px; }
-            .no-print { display: none; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <h1>Leave Application</h1>
-          <p>${req.employee?.firstName} ${req.employee?.lastName} - ${req.employee?.employeeId}</p>
-        </div>
-
-        <div class="section">
-          <h3>Employee Information</h3>
-          <div class="grid">
-            <div class="field"><label>Full Name</label><p>${req.employee?.firstName} ${req.employee?.lastName}</p></div>
-            <div class="field"><label>Employee ID</label><p>${req.employee?.employeeId}</p></div>
-            <div class="field"><label>Department</label><p>${req.employee?.department?.name || 'N/A'}</p></div>
-            <div class="field"><label>Position</label><p>${req.employee?.position || 'N/A'}</p></div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h3>Leave Details</h3>
-          <div class="grid">
-            <div class="field"><label>Leave Type</label><p>${req.leaveType?.name}</p></div>
-            <div class="field"><label>Status</label><p><span class="status-badge status-${req.status}">${req.status.charAt(0).toUpperCase() + req.status.slice(1)}</span></p></div>
-            <div class="field"><label>Start Date</label><p>${formatDateLong(req.startDate)}</p></div>
-            <div class="field"><label>End Date</label><p>${formatDateLong(req.endDate)}</p></div>
-            <div class="field"><label>Duration</label><p>${req.duration} business day${req.duration !== 1 ? 's' : ''}</p></div>
-            <div class="field"><label>Date Submitted</label><p>${formatDateLong(req.createdAt)}</p></div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h3>Reason</h3>
-          <div class="reason-box">${req.reason || 'No reason provided'}</div>
-        </div>
-
-        ${req.rejectionReason ? `
-        <div class="section">
-          <h3>Rejection Reason</h3>
-          <div class="reason-box" style="border-color: #fecaca; background: #fef2f2; color: #991b1b;">${req.rejectionReason}</div>
-        </div>
-        ` : ''}
-
-        ${req.status === 'approved' && req.approver ? `
-        <div class="signature-section">
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 8px;">
-            <div>
-              <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 12px;">Approved By</h3>
-              ${req.approver.signature ? `
-              <div style="margin-bottom: 8px;">
-                <img src="${req.approver.signature}" alt="Signature" style="max-height: 50px; max-width: 200px;" />
-              </div>
-              ` : `
-              <div style="margin-bottom: 8px; font-family: 'Great Vibes', 'Cedarville Cursive', cursive; font-size: 24px; color: #1a1a2e;">
-                ${req.approver.firstName} ${req.approver.lastName}
-              </div>
-              `}
-              <p style="font-size: 14px; color: #1a1a2e; font-weight: 600; margin: 0;">${req.approver.firstName} ${req.approver.lastName}</p>
-              <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">${req.approver.position || 'Administrator'}</p>
-              <p style="font-size: 11px; color: #94a3b8; margin: 4px 0 0 0;">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-            </div>
-            <div style="text-align: right;">
-              <p style="font-size: 11px; color: #94a3b8; margin: 0;">Leave Management System</p>
-            </div>
-          </div>
-        </div>
-        ` : ''}
-
-        <div class="footer">
-          <p>This is a computer-generated document. Printed on ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-          <p style="margin-top: 4px;">Leave Management System</p>
-        </div>
-
-        <script>window.print(); window.onafterprint = () => window.close();</script>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
+    setSelectedRequest(req);
+    setTimeout(() => {
+      window.print();
+    }, 150);
   };
 
   return (
@@ -433,106 +314,50 @@ export default function LeaveRequests() {
 
       {/* Detail Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedRequest(null)}>
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-[#E8ECF1]" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-gray-900">Leave Request Details</h2>
-              <button onClick={() => setSelectedRequest(null)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="p-3 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-500 mb-0.5">Employee</p>
-                <p className="font-medium text-gray-900">{selectedRequest.employee?.firstName} {selectedRequest.employee?.lastName}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-500 mb-0.5">Leave Type</p>
-                <p className="font-medium text-gray-900 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: selectedRequest.leaveType?.color }} />
-                  {selectedRequest.leaveType?.name}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-500 mb-0.5">Start Date</p>
-                <p className="font-medium text-gray-900">{formatDateLong(selectedRequest.startDate)}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-500 mb-0.5">End Date</p>
-                <p className="font-medium text-gray-900">{formatDateLong(selectedRequest.endDate)}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-500 mb-0.5">Duration</p>
-                <p className="font-medium text-gray-900">{selectedRequest.duration} days</p>
-              </div>
-              <div className="p-3 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-500 mb-0.5">Status</p>
-                <span className={cn('inline-block px-2.5 py-0.5 rounded-full text-xs font-medium border mt-1', statusStyles[selectedRequest.status])}>
-                  {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
-                </span>
-              </div>
-            </div>
-            {selectedRequest.reason && (
-              <div className="mt-4 p-3 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-500 mb-1">Reason</p>
-                <p className="text-sm text-gray-700">{selectedRequest.reason}</p>
-              </div>
-            )}
-            {selectedRequest.rejectionReason && (
-              <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
-                <p className="text-xs text-red-500 mb-1">Rejection Reason</p>
-                <p className="text-sm text-red-700">{selectedRequest.rejectionReason}</p>
-              </div>
-            )}
-            {selectedRequest.status === 'approved' && selectedRequest.approver && (
-              <div className="mt-4 p-3 rounded-lg bg-green-50 border border-green-200">
-                <p className="text-xs text-green-600 mb-2 font-medium">Approved By</p>
-                <div className="flex items-center gap-3">
-                  {selectedRequest.approver.signature ? (
-                    <img
-                      src={selectedRequest.approver.signature}
-                      alt="Signature"
-                      className="h-10 object-contain"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-lg bg-[#5B5FEF]/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-bold text-[#5B5FEF]">
-                        {selectedRequest.approver.firstName?.[0]}{selectedRequest.approver.lastName?.[0]}
-                      </span>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {selectedRequest.approver.firstName} {selectedRequest.approver.lastName}
-                    </p>
-                    <p className="text-xs text-gray-500">{selectedRequest.approver.position || 'Administrator'}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="flex gap-2 mt-5">
-              {selectedRequest.status === 'rejected' && (
-                <Link
-                  to={`/apply-leave?leaveTypeId=${selectedRequest.leaveTypeId}&startDate=${selectedRequest.startDate}&endDate=${selectedRequest.endDate}&reason=${encodeURIComponent(selectedRequest.reason || '')}&durationType=full`}
-                  className="btn-primary flex items-center gap-2 flex-1 justify-center"
-                >
-                  <FileText className="w-4 h-4" />
-                  Re-apply
-                </Link>
-              )}
-              <button
-                onClick={() => handlePrint(selectedRequest)}
-                className={cn(
-                  'flex items-center gap-2 flex-1 justify-center',
-                  selectedRequest.status === 'rejected' ? 'btn-secondary' : 'btn-primary'
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 md:p-8 no-print-bg overflow-y-auto" onClick={() => setSelectedRequest(null)}>
+          <div className="pointer-events-none absolute inset-0 no-print" /> {/* Print helper: hide background */}
+          <div className="bg-white max-w-4xl w-full shadow-2xl relative my-auto print-modal-content print:shadow-none print:w-full print:absolute print:inset-0" onClick={(e) => e.stopPropagation()}>
+            {/* Action Buttons (Hidden on Print) */}
+            <div className="bg-gray-50 border-b border-[#E8ECF1] p-4 flex items-center justify-between rounded-t-xl no-print sticky top-0 z-20">
+              <h2 className="text-lg font-bold text-gray-900">Leave Application Form</h2>
+              <div className="flex gap-2">
+                {selectedRequest.status === 'rejected' && (
+                  <Link
+                    to={`/apply-leave?leaveTypeId=${selectedRequest.leaveTypeId}&startDate=${selectedRequest.startDate}&endDate=${selectedRequest.endDate}&reason=${encodeURIComponent(selectedRequest.reason || '')}&durationType=full`}
+                    className="btn-primary flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Re-apply
+                  </Link>
                 )}
-              >
-                <Printer className="w-4 h-4" />
-                Print
-              </button>
-              <button className="btn-secondary flex-1" onClick={() => setSelectedRequest(null)}>
-                Close
-              </button>
+                {selectedRequest.status === 'pending' && canApprove && (
+                  <>
+                    <button onClick={() => handleApprove(selectedRequest.id)} className="btn-primary bg-green-600 hover:bg-green-700 flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" /> Approve
+                    </button>
+                    <button onClick={() => handleReject(selectedRequest.id)} className="btn-danger flex items-center gap-2">
+                      <XCircle className="w-4 h-4" /> Reject
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={() => window.print()}
+                  className="btn-primary flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4" />
+                  Print / Export
+                </button>
+                <button className="btn-secondary" onClick={() => setSelectedRequest(null)}>
+                  Close
+                </button>
+              </div>
+            </div>
+
+            {/* Printable Form Area */}
+            <div className="overflow-x-auto print:overflow-visible">
+               <div className="min-w-[800px]">
+                 <LeavePrintForm request={selectedRequest} />
+               </div>
             </div>
           </div>
         </div>
