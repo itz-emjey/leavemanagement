@@ -406,9 +406,11 @@ export default function Dashboard() {
         <div className="xl:col-span-2">
           <RecentLeaveRequests requests={data.recentRequests} />
         </div>
-        <div>
-          <RecentActivities activities={data.recentActivities} />
-        </div>
+        {isAdmin && (
+          <div>
+            <RecentActivities activities={data.recentActivities} />
+          </div>
+        )}
       </div>
     </div>
   );
