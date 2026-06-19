@@ -27,6 +27,18 @@ FROM nginx:1.27-alpine AS production
 # Default fallback to prevent crash if variable is missing
 ENV BACKEND_URL=http://localhost:5000
 
+# Fix BACKEND_URL to ensure it has http:// or https:// prefix (fixes invalid URL prefix crashes)
+RUN echo '#!/bin/sh' > /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo 'if [ -z "$BACKEND_URL" ]; then' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo '  export BACKEND_URL="http://localhost:5000"' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo 'else' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo '  case "$BACKEND_URL" in' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo '    http://*|https://*) ;;' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo '    *) export BACKEND_URL="https://$BACKEND_URL" ;;' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo '  esac' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    echo 'fi' >> /docker-entrypoint.d/19-fix-backend-url.envsh && \
+    chmod +x /docker-entrypoint.d/19-fix-backend-url.envsh
+
 # Copy nginx configuration as a template (official nginx image will automatically envsubst it)
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
