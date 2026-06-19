@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: window.API_URL || '/api',
+  baseURL: '/api',
   withCredentials: true, // Send httpOnly cookies
   headers: {
     'Content-Type': 'application/json',
