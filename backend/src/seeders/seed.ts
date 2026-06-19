@@ -2,6 +2,7 @@ import sequelize from '../config/database';
 import bcrypt from 'bcrypt';
 import '../models/index';
 import { Role, Department, User, Employee, LeaveType, LeaveBalance, Permission } from '../models';
+import { Op } from 'sequelize';
 import { logger } from '../utils/logger';
 
 const seed = async () => {
@@ -12,32 +13,36 @@ const seed = async () => {
     await sequelize.sync({ alter: true });
     logger.info('Tables synced.');
 
+    // Check if already seeded
+    const existingAdmin = await User.findOne({ where: { email: 'admin@company.com' } });
+    if (existingAdmin) {
+      logger.info('Database already seeded. Skipping.');
+      process.exit(0);
+    }
+
     // Roles
-    const roles = await Role.bulkCreate([
-      { name: 'admin', description: 'System Administrator' },
-      { name: 'manager', description: 'Department Manager' },
-      { name: 'employee', description: 'Regular Employee' },
-    ]);
+    const [adminRole] = await Role.findOrCreate({ where: { name: 'admin' }, defaults: { name: 'admin', description: 'System Administrator' } });
+    const [managerRole] = await Role.findOrCreate({ where: { name: 'manager' }, defaults: { name: 'manager', description: 'Department Manager' } });
+    const [employeeRole] = await Role.findOrCreate({ where: { name: 'employee' }, defaults: { name: 'employee', description: 'Regular Employee' } });
+    const roles = [adminRole, managerRole, employeeRole];
     logger.info('Roles seeded.');
 
     // Departments
-    const departments = await Department.bulkCreate([
-      { name: 'Engineering', description: 'Software Engineering Department' },
-      { name: 'Human Resources', description: 'HR Department' },
-      { name: 'Finance', description: 'Finance and Accounting' },
-      { name: 'Marketing', description: 'Marketing and Communications' },
-      { name: 'Operations', description: 'Operations Management' },
-    ]);
+    const [engDept] = await Department.findOrCreate({ where: { name: 'Engineering' }, defaults: { name: 'Engineering', description: 'Software Engineering Department' } });
+    const [hrDept] = await Department.findOrCreate({ where: { name: 'Human Resources' }, defaults: { name: 'Human Resources', description: 'HR Department' } });
+    const [finDept] = await Department.findOrCreate({ where: { name: 'Finance' }, defaults: { name: 'Finance', description: 'Finance and Accounting' } });
+    const [mktDept] = await Department.findOrCreate({ where: { name: 'Marketing' }, defaults: { name: 'Marketing', description: 'Marketing and Communications' } });
+    const [opsDept] = await Department.findOrCreate({ where: { name: 'Operations' }, defaults: { name: 'Operations', description: 'Operations Management' } });
+    const departments = [engDept, hrDept, finDept, mktDept, opsDept];
     logger.info('Departments seeded.');
 
     // Leave Types
-    const leaveTypes = await LeaveType.bulkCreate([
-      { name: 'Annual Leave', description: 'Yearly paid vacation leave', defaultDays: 12, color: '#3B82F6' },
-      { name: 'Sick Leave', description: 'Medical and health-related leave', defaultDays: 14, color: '#EF4444' },
-      { name: 'Personal Leave', description: 'Personal matters leave', defaultDays: 5, color: '#F59E0B' },
-      { name: 'Maternity Leave', description: 'Maternity leave', defaultDays: 90, color: '#EC4899' },
-      { name: 'Paternity Leave', description: 'Paternity leave', defaultDays: 7, color: '#8B5CF6' },
-    ]);
+    const annualLT = await LeaveType.findOrCreate({ where: { name: 'Annual Leave' }, defaults: { name: 'Annual Leave', description: 'Yearly paid vacation leave', defaultDays: 12, color: '#3B82F6' } }).then(r => r[0]);
+    const sickLT = await LeaveType.findOrCreate({ where: { name: 'Sick Leave' }, defaults: { name: 'Sick Leave', description: 'Medical and health-related leave', defaultDays: 14, color: '#EF4444' } }).then(r => r[0]);
+    const personalLT = await LeaveType.findOrCreate({ where: { name: 'Personal Leave' }, defaults: { name: 'Personal Leave', description: 'Personal matters leave', defaultDays: 5, color: '#F59E0B' } }).then(r => r[0]);
+    const maternityLT = await LeaveType.findOrCreate({ where: { name: 'Maternity Leave' }, defaults: { name: 'Maternity Leave', description: 'Maternity leave', defaultDays: 90, color: '#EC4899' } }).then(r => r[0]);
+    const paternityLT = await LeaveType.findOrCreate({ where: { name: 'Paternity Leave' }, defaults: { name: 'Paternity Leave', description: 'Paternity leave', defaultDays: 7, color: '#8B5CF6' } }).then(r => r[0]);
+    const leaveTypes = [annualLT, sickLT, personalLT, maternityLT, paternityLT];
     logger.info('Leave types seeded.');
 
     // Admin User
@@ -45,7 +50,7 @@ const seed = async () => {
     const adminUser = await User.create({
       email: 'admin@company.com',
       password: hashedPassword,
-      roleId: roles[0].id,
+      roleId: adminRole.id,
     });
 
     const adminEmployee = await Employee.create({
@@ -55,7 +60,7 @@ const seed = async () => {
       lastName: 'Admin',
       email: 'admin@company.com',
       position: 'System Administrator',
-      departmentId: departments[1].id, // HR
+      departmentId: hrDept.id,
       hireDate: new Date('2024-01-01'),
     });
     logger.info('Admin user seeded.');
@@ -117,7 +122,7 @@ const seed = async () => {
         }
       }
     }
-    await Permission.bulkCreate(permissions);
+    await Permission.bulkCreate(permissions, { ignoreDuplicates: true });
     logger.info('Default permissions seeded.');
 
     logger.info('Seeding complete!');
