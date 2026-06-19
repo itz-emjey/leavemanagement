@@ -37,6 +37,17 @@ const startServer = async () => {
   try {
     await testConnection();
     logger.info('Database connected.');
+
+    // Fast targeted column addition — runs in milliseconds, ensures login doesn't
+    // crash on "Unknown column 'signature'" before the full sync completes.
+    try {
+      await sequelize.query(
+        "ALTER TABLE employees ADD COLUMN signature LONGTEXT NULL"
+      );
+      logger.info('Signature column added/verified.');
+    } catch {
+      // Column already exists — not an error
+    }
   } catch (error) {
     logger.warn('Database connection failed. Server will start without DB:', { error: String(error) });
   }
@@ -50,7 +61,7 @@ const startServer = async () => {
     logger.info(`CORS origin: ${config.frontendUrl}`);
   });
 
-  // Run schema sync in the background — adds missing columns without blocking startup
+  // Run full schema sync in the background — catches any other missing columns or tables
   sequelize.sync({ alter: true }).then(() => {
     logger.info('Database schema synced successfully.');
   }).catch((err) => {

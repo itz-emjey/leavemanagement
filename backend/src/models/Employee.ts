@@ -117,6 +117,9 @@ Employee.init(
     sequelize,
     tableName: 'employees',
     paranoid: true,
+    defaultScope: {
+      attributes: { exclude: ['signature'] },
+    },
     indexes: [
       {
         name: 'idx_employees_department',
