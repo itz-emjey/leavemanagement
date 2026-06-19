@@ -1,5 +1,6 @@
 import { Response } from 'express';
-import { LeaveType, AuditLog } from '../models';
+import { literal } from 'sequelize';
+import { LeaveType, LeaveBalance, AuditLog } from '../models';
 import { AuthRequest } from '../middleware/auth';
 import { cacheGet, cacheSet, cacheDelete } from '../utils/cache';
 import { logger } from '../utils/logger';
@@ -74,12 +75,38 @@ export const updateLeaveType = async (req: AuthRequest, res: Response): Promise<
     }
 
     const { name, description, defaultDays, color } = req.body;
+    const oldDefaultDays = leaveType.defaultDays;
+
     await leaveType.update({
       name: name || leaveType.name,
       description: description !== undefined ? description : leaveType.description,
       defaultDays: defaultDays !== undefined ? defaultDays : leaveType.defaultDays,
       color: color || leaveType.color,
     });
+
+    // Sync all current-year employee balances when defaultDays changes
+    if (defaultDays !== undefined && defaultDays !== oldDefaultDays) {
+      const currentYear = new Date().getFullYear();
+      const [updatedCount] = await LeaveBalance.update(
+        {
+          allocated: defaultDays,
+          remaining: literal(`GREATEST(${defaultDays} - used, 0)`),
+        },
+        {
+          where: { leaveTypeId: leaveType.id, year: currentYear },
+        }
+      );
+
+      await AuditLog.create({
+        userId: req.user!.userId,
+        action: 'sync',
+        entity: 'leave_balance',
+        entityId: leaveType.id,
+        details: `Synced employee balances for leave type "${leaveType.name}" from ${oldDefaultDays} to ${defaultDays} days (${updatedCount} records)`,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+    }
 
     await AuditLog.create({
       userId: req.user!.userId,
