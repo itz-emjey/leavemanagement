@@ -720,4 +720,57 @@ export const levelApproveLeaveRequest = async (req: AuthRequest, res: Response):
   }
 };
 
+// GET /api/leave-requests/calendar
+export const getLeaveRequestCalendar = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const currentYear = new Date().getFullYear();
+    const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
+
+    const startDate = `${currentYear}-${String(month).padStart(2, '0')}-01`;
+    const endDate = new Date(currentYear, month, 0).toISOString().split('T')[0];
+
+    const whereClause: any = {
+      status: { [Op.in]: ['approved', 'pending'] },
+      startDate: { [Op.lte]: endDate },
+      endDate: { [Op.gte]: startDate },
+    };
+
+    if (req.user?.role === 'employee') {
+      const emp = await Employee.findOne({ where: { userId: req.user.userId } });
+      if (emp) whereClause.employeeId = emp.id;
+    }
+
+    const leaves = await LeaveRequest.findAll({
+      where: whereClause,
+      include: [
+        { model: Employee, as: 'employee', attributes: ['firstName', 'lastName', 'employeeId'] },
+        { model: LeaveType, as: 'leaveType', attributes: ['name', 'color'] },
+      ],
+      order: [['startDate', 'ASC']],
+    });
+
+    const events = leaves.map((lr: any) => ({
+      id: String(lr.id),
+      title: lr.employee
+        ? `${lr.employee.firstName} ${lr.employee.lastName} - ${lr.leaveType?.name}`
+        : `${lr.leaveType?.name}`,
+      start: lr.startDate,
+      end: lr.endDate,
+      backgroundColor: lr.status === 'approved' ? (lr.leaveType?.color || '#3B82F6') : '#F59E0B',
+      borderColor: lr.status === 'approved' ? (lr.leaveType?.color || '#3B82F6') : '#F59E0B',
+      textColor: '#FFFFFF',
+      extendedProps: {
+        status: lr.status,
+        employeeName: lr.employee ? `${lr.employee.firstName} ${lr.employee.lastName}` : '',
+        leaveType: lr.leaveType?.name,
+      },
+    }));
+
+    res.json({ events });
+  } catch (error) {
+    logger.error('Calendar error:', { error: (error as Error).message });
+    res.status(500).json({ message: 'Failed to fetch calendar events.' });
+  }
+};
+
 
