@@ -24,23 +24,8 @@ RUN npm run build
 # ── Stage 2: nginx serve ──────────────────────────────────
 FROM nginx:1.27-alpine AS production
 
-# Default fallback to prevent crash if variable is missing
-ENV BACKEND_URL=http://localhost:5000
-
-# Fix BACKEND_URL to ensure it has http:// or https:// prefix (fixes invalid URL prefix crashes)
-RUN echo '#!/bin/sh' > /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo 'if [ -z "$BACKEND_URL" ]; then' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo '  export BACKEND_URL="http://localhost:5000"' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo 'else' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo '  case "$BACKEND_URL" in' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo '    http://*|https://*) ;;' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo '    *) export BACKEND_URL="https://$BACKEND_URL" ;;' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo '  esac' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    echo 'fi' >> /docker-entrypoint.d/19-fix-backend-url.sh && \
-    chmod +x /docker-entrypoint.d/19-fix-backend-url.sh
-
-# Copy nginx configuration as a template (official nginx image will automatically envsubst it)
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+# Copy nginx configuration directly (no template variables to substitute)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
