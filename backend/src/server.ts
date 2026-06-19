@@ -36,9 +36,7 @@ io.on('connection', (socket) => {
 const startServer = async () => {
   try {
     await testConnection();
-    // Auto-sync model schema (adds missing columns/tables without dropping data)
-    await sequelize.sync({ alter: true });
-    logger.info('Database synced successfully.');
+    logger.info('Database connected.');
   } catch (error) {
     logger.warn('Database connection failed. Server will start without DB:', { error: String(error) });
   }
@@ -46,9 +44,17 @@ const startServer = async () => {
   // Initialize scheduled cron jobs
   initCronJobs();
 
+  // Start listening immediately so Railway health checks pass (prevent 504 timeout)
   server.listen(config.port, () => {
     logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
     logger.info(`CORS origin: ${config.frontendUrl}`);
+  });
+
+  // Run schema sync in the background — adds missing columns without blocking startup
+  sequelize.sync({ alter: true }).then(() => {
+    logger.info('Database schema synced successfully.');
+  }).catch((err) => {
+    logger.warn('Schema sync failed (non-fatal):', { error: String(err) });
   });
 };
 
