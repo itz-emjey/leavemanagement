@@ -89,9 +89,20 @@ app.use(helmet({
   contentSecurityPolicy: false, // Disabled for SPA with Vite dev server
 }));
 
-// CORS
+// CORS — accept configured FRONTEND_URL plus local dev origins
+const allowedOrigins = [
+  config.frontendUrl,
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 app.use(cors({
-  origin: config.frontendUrl,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, origin);
+    logger.warn(`CORS blocked origin: ${origin} (expected: ${config.frontendUrl})`);
+    callback(null, false);
+  },
   credentials: true,
 }));
 

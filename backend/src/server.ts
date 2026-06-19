@@ -46,6 +46,7 @@ const startServer = async () => {
 
   server.listen(config.port, () => {
     logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
+    logger.info(`CORS origin: ${config.frontendUrl}`);
   });
 };
 
