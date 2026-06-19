@@ -28,7 +28,7 @@ export default function LeavePrintForm({ request: req }: LeavePrintFormProps) {
   const isType = (matches: string[]) => matches.some(m => leaveName.includes(m));
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white text-black p-4 md:p-8 font-sans h-full">
+    <div className="w-full max-w-4xl mx-auto bg-white text-black p-4 md:p-8 font-sans h-full print:max-w-none print:w-full">
       {/* Header */}
       <div className="flex items-center mb-6">
         <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 flex items-center justify-center bg-white print:w-[100px] print:h-[100px] print:block">
@@ -43,7 +43,7 @@ export default function LeavePrintForm({ request: req }: LeavePrintFormProps) {
           />
         </div>
         
-        <div className="flex-1 text-center pr-24 sm:pr-28 print:pr-[100px]">
+        <div className="flex-1 text-center">
           <h1 className="text-[1.1rem] sm:text-[1.35rem] font-bold uppercase tracking-wide print:text-[16pt]">
             San Lorenzo Ruiz College of Ormoc, Inc.
           </h1>
@@ -192,7 +192,7 @@ export default function LeavePrintForm({ request: req }: LeavePrintFormProps) {
 
       {/* Signatures Full Table */}
       <div className="overflow-x-auto w-full">
-        <table className="w-full border-collapse border border-black text-center text-[12px] md:text-[13px] table-fixed min-w-[600px]">
+        <table className="w-full border-collapse border border-black text-center text-[12px] md:text-[13px] table-fixed min-w-[600px] print:min-w-0">
           <thead>
             <tr className="bg-white">
               <td className="border border-black px-2 py-1 text-left w-1/4">Requested By:</td>
@@ -258,7 +258,7 @@ export default function LeavePrintForm({ request: req }: LeavePrintFormProps) {
         </table>
 
         {/* Footer Notes Attached to Table */}
-        <table className="w-full border-collapse border-l border-r border-b border-black text-left text-[11px] md:text-[12px] min-w-[600px]">
+        <table className="w-full border-collapse border-l border-r border-b border-black text-left text-[11px] md:text-[12px] min-w-[600px] print:min-w-0">
           <tbody>
             <tr>
               <td className="pt-1.5 pb-0.5 px-2">
