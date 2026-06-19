@@ -393,10 +393,12 @@ export default function Dashboard() {
         <div className="xl:col-span-2">
           <CalendarView events={data.calendarEvents} />
         </div>
-        <div className="space-y-6">
-          <MonthlyTrendsChart data={data.monthlyTrends} />
-          <LeaveTypePieChart data={data.leaveTypeDistribution} />
-        </div>
+        {isAdmin && (
+          <div className="space-y-6">
+            <MonthlyTrendsChart data={data.monthlyTrends} />
+            <LeaveTypePieChart data={data.leaveTypeDistribution} />
+          </div>
+        )}
       </div>
 
       {/* Recent Activity */}
