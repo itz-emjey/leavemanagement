@@ -267,7 +267,7 @@ export const getEmployeeLeaveStatement = async (req: AuthRequest, res: Response)
 
     const employee = await Employee.findByPk(employeeId, {
       include: [{ model: Department, as: 'department', attributes: ['name'] }],
-      attributes: ['id', 'firstName', 'lastName', 'employeeId', 'position', 'email', 'hireDate', 'signature']),
+      attributes: ['id', 'firstName', 'lastName', 'employeeId', 'position', 'email', 'hireDate', 'signature'],
     });
 
     if (!employee) {
@@ -398,3 +398,4 @@ export const getReportSummary = async (req: AuthRequest, res: Response): Promise
     res.status(500).json({ message: 'Failed to load report summary.' });
   }
 };
+
