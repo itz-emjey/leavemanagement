@@ -7,7 +7,6 @@ import {
   approveLeaveRequest,
   rejectLeaveRequest,
   cancelLeaveRequest,
-  getLeaveRequestCalendar,
   levelApproveLeaveRequest,
 } from '../controllers/leaveRequestController';
 import { protect } from '../middleware/auth';
@@ -47,6 +46,5 @@ router.patch('/:id/approve', authorizePermission('leave_requests', 'approve'), a
 router.patch('/:id/reject', authorizePermission('leave_requests', 'reject'), rejectLeaveRequest);
 router.patch('/:id/cancel', authorizePermission('leave_requests', 'cancel'), cancelLeaveRequest);
 router.patch('/:id/level-approve', levelApproveLeaveRequest);
-router.get('/calendar', getLeaveRequestCalendar);
 
 export default router;

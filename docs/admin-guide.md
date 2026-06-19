@@ -402,7 +402,6 @@ Permissions are organized by **Resource** and **Action**:
 | leave_types | create, read, update, delete |
 | departments | create, read, update, delete |
 | holidays | create, read, update, delete |
-| leave_policies | create, read, update, delete |
 | leave_credits | read, adjust, carry_over |
 | reports | read, export |
 | audit_logs | read, export |

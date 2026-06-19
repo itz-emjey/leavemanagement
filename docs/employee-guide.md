@@ -13,9 +13,7 @@
 2. [Dashboard](#2-dashboard)
 3. [Applying for Leave](#3-applying-for-leave)
 4. [Viewing Leave Requests](#4-viewing-leave-requests)
-5. [Team Calendar](#5-team-calendar)
-6. [Recurring Leave Patterns](#6-recurring-leave-patterns)
-7. [Reports & Statement](#7-reports--statement)
+5. [Reports & Statement](#5-reports--statement)
 8. [Profile Management](#8-profile-management)
 9. [Notifications](#9-notifications)
 10. [Troubleshooting](#10-troubleshooting)
@@ -191,62 +189,7 @@ If your leave was rejected:
 3. The form is pre-filled with your previous entries
 4. Adjust dates/reason as needed and re-submit
 
----
 
-## 5. Team Calendar
-
-### Access
-
-Navigate to: **Sidebar → Team Calendar**
-
-### Features
-
-The team calendar shows approved leaves for all team members in your department.
-
-- **Color-coded events** — Each leave type has a distinct color
-- **Hover for details** — Hover over any event to see the employee name and leave details
-- **Month/Week/Day views** — Toggle between calendar views
-- **Filter by team** — View specific teams or departments
-
-This helps you:
-- Know when colleagues are out of office
-- Plan team activities around absences
-- Coordinate coverage
-
----
-
-## 6. Recurring Leave Patterns
-
-### Access
-
-Navigate to: **Sidebar → Leave Patterns**
-
-### Features
-
-Set up recurring leave patterns for regular commitments (e.g., weekly medical appointments, recurring personal time).
-
-#### Creating a Pattern
-1. Click **"Add Pattern"**
-2. Configure:
-   - **Leave Type** — Select the applicable type
-   - **Frequency** — Weekly, Bi-weekly, or Monthly
-   - **Day of Week** — Which day(s) of the week
-   - **Start Date** — When the pattern begins
-   - **End Date** — Optional end date
-   - **Reason** — Brief explanation
-3. Click **"Save"**
-
-#### Generating Leave Requests
-1. Once a pattern is saved, click **"Generate"**
-2. The system creates individual leave requests for each occurrence
-3. These requests go through the normal approval process
-
-#### Managing Patterns
-- **Pause** — Temporarily stop generating leaves from a pattern
-- **Edit** — Update pattern settings
-- **Cancel** — End the pattern entirely
-
----
 
 ## 7. Reports & Statement
 

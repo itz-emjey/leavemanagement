@@ -33,10 +33,6 @@ jest.mock('../models', () => ({
   },
 }));
 
-jest.mock('../models/LeavePolicy', () => ({
-  findOne: jest.fn(),
-}));
-
 // Mock Permission and Role model imports in rbac.ts to prevent Sequelize init()
 jest.mock('../models/Permission', () => ({}));
 jest.mock('../models/Role', () => ({}));

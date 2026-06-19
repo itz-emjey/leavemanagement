@@ -190,29 +190,6 @@ export interface LeaveRequestFilter {
   limit?: number;
 }
 
-// ─── Leave Policy Types ──────────────────────────────────────────────
-
-export interface LeavePolicyBrief {
-  id: number;
-  leaveTypeId: number;
-  maxConsecutiveDays: number;
-  minNoticeDays: number;
-  carryOverLimit: number;
-  requiresApproval: boolean;
-  isActive: boolean;
-  accrualRule: 'none' | 'monthly' | 'quarterly' | 'yearly';
-  leaveType?: LeaveTypeBrief;
-}
-
-export interface CreateLeavePolicyRequest {
-  leaveTypeId: number;
-  maxConsecutiveDays: number;
-  minNoticeDays: number;
-  carryOverLimit: number;
-  requiresApproval: boolean;
-  accrualRule: 'none' | 'monthly' | 'quarterly' | 'yearly';
-}
-
 // ─── Leave Request Approval Types ────────────────────────────────────
 
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
@@ -226,26 +203,6 @@ export interface LeaveRequestApprovalBrief {
   comment?: string;
   createdAt: string;
   approver?: EmployeeBrief;
-}
-
-// ─── Leave Pattern Types ─────────────────────────────────────────────
-
-export type PatternFrequency = 'weekly' | 'biweekly' | 'monthly';
-export type PatternStatus = 'active' | 'paused' | 'cancelled';
-
-export interface LeavePatternBrief {
-  id: number;
-  employeeId: number;
-  leaveTypeId: number;
-  frequency: PatternFrequency;
-  dayOfWeek: number;
-  weekOfMonth?: number;
-  startDate: string;
-  endDate?: string;
-  status: PatternStatus;
-  reason?: string;
-  employee?: EmployeeBrief;
-  leaveType?: LeaveTypeBrief;
 }
 
 // ─── Holiday Types ───────────────────────────────────────────────────
@@ -421,17 +378,4 @@ export interface PaginationQuery {
   sortOrder?: 'ASC' | 'DESC';
 }
 
-// ─── Calendar Types ──────────────────────────────────────────────────
 
-export interface CalendarEvent {
-  id: number;
-  title: string;
-  start: string;
-  end: string;
-  color: string;
-  extendedProps: {
-    status: LeaveStatus;
-    employeeName: string;
-    leaveType: string;
-  };
-}

@@ -86,7 +86,6 @@ const seed = async () => {
       { resource: 'leave_types', actions: ['create', 'read', 'update', 'delete'] },
       { resource: 'departments', actions: ['create', 'read', 'update', 'delete'] },
       { resource: 'holidays', actions: ['create', 'read', 'update', 'delete'] },
-      { resource: 'leave_policies', actions: ['create', 'read', 'update', 'delete'] },
       { resource: 'leave_credits', actions: ['read', 'adjust', 'carry_over'] },
       { resource: 'reports', actions: ['read', 'export'] },
       { resource: 'audit_logs', actions: ['read', 'export'] },

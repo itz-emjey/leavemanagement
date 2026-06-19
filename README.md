@@ -374,8 +374,6 @@ The API is organized into the following resource groups:
 | Leave Requests | `/api/leave-requests` | Yes |
 | Leave Credits | `/api/leave-credits` | Yes (admin) |
 | Leave Types | `/api/leave-types` | Yes |
-| Leave Policies | `/api/leave-policies` | Yes |
-| Leave Patterns | `/api/leave-patterns` | Yes |
 | Departments | `/api/departments` | Yes |
 | Holidays | `/api/holidays` | Yes |
 | Notifications | `/api/notifications` | Yes |
@@ -384,7 +382,6 @@ The API is organized into the following resource groups:
 | Analytics | `/api/analytics` | Yes (admin) |
 | Permissions | `/api/permissions` | Yes (admin) |
 | System Config | `/api/system-config` | Yes (admin) |
-| Calendar | `/api/calendar` | Public (with token) |
 | Monitoring | `/api/health`, `/api/metrics` | Public |
 
 ---

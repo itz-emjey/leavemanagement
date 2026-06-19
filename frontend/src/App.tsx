@@ -17,13 +17,10 @@ import LeaveCredits from '@/pages/LeaveCredits';
 import LeaveTypes from '@/pages/LeaveTypes';
 import Departments from '@/pages/Departments';
 import EmployeeStatement from '@/pages/EmployeeStatement';
-import LeavePolicies from '@/pages/LeavePolicies';
-import TeamCalendar from '@/pages/TeamCalendar';
 import Permissions from '@/pages/Permissions';
 import SystemConfig from '@/pages/SystemConfig';
 import Analytics from '@/pages/Analytics';
 import ReloadPrompt from '@/components/ReloadPrompt';
-import LeavePatterns from '@/pages/LeavePatterns';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 function App() {
@@ -49,8 +46,6 @@ function App() {
               <Route path="/leave-requests" element={<LeaveRequests />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/employee-statement" element={<EmployeeStatement />} />
-              <Route path="/team-calendar" element={<TeamCalendar />} />
-              <Route path="/leave-patterns" element={<LeavePatterns />} />
               <Route path="/analytics" element={<Analytics />} />
 
               {/* Admin Routes */}
@@ -61,7 +56,6 @@ function App() {
                 <Route path="/departments" element={<Departments />} />
                 <Route path="/holidays" element={<Holidays />} />
                 <Route path="/audit-logs" element={<AuditLogs />} />
-                <Route path="/leave-policies" element={<LeavePolicies />} />
                 <Route path="/permissions" element={<Permissions />} />
                 <Route path="/admin/system-config" element={<SystemConfig />} />
               </Route>

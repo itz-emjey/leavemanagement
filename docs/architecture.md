@@ -176,8 +176,6 @@ The app uses React Router v7 with nested route layouts:
             /leave-requests
             /reports
             /employee-statement
-            /team-calendar
-            /leave-patterns
             /analytics
 
             <!-- Admin-only routes -->
@@ -188,7 +186,6 @@ The app uses React Router v7 with nested route layouts:
               /departments
               /holidays
               /audit-logs
-              /leave-policies
               /permissions
               /admin/system-config
             </AdminRoute>
@@ -393,8 +390,6 @@ Errors are handled through a centralized `errorHandler` middleware:
 | `leave_balances` | Per-employee leave allocations | `id`, `employeeId`, `leaveTypeId`, `allocated`, `used`, `remaining`, `year` |
 | `leave_requests` | Leave applications | `id`, `employeeId`, `leaveTypeId`, `startDate`, `endDate`, `duration`, `status` |
 | `leave_request_approvals` | Multi-level approval steps | `id`, `leaveRequestId`, `approverId`, `level`, `status` |
-| `leave_patterns` | Recurring leave schedules | `id`, `employeeId`, `leaveTypeId`, `frequency`, `dayOfWeek` |
-| `leave_policies` | Leave type policies | `id`, `leaveTypeId`, `maxConsecutiveDays`, `carryOverLimit` |
 | `holidays` | Company holidays | `id`, `name`, `date`, `isRecurring` |
 | `notifications` | In-app notifications | `id`, `userId`, `title`, `message`, `type`, `isRead` |
 | `audit_logs` | Activity audit trail | `id`, `userId`, `action`, `entity`, `entityId`, `details` |
@@ -564,8 +559,7 @@ Layer 10 — Error Handling: Centralized, no stack leaks
 4. Controller:
    a. Validate employee belongs to authenticated user
    b. Check leave type exists and is active
-   c. Validate leave policy (max consecutive days, notice period)
-   d. Check for overlapping leave requests
+   c. Check for overlapping leave requests
    e. Verify sufficient leave balance
    f. Create LeaveRequest with status='pending'
    g. Create AuditLog entry

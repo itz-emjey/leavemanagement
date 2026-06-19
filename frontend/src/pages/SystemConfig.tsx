@@ -173,7 +173,7 @@ export default function SystemConfig() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">System Configuration</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Manage application settings, leave policies, and system preferences
+            Manage application settings and system preferences
           </p>
         </div>
         <div className="flex items-center gap-3">

@@ -4,7 +4,6 @@ import sequelize from '../config/database';
 import { LeaveRequest, LeaveBalance, Employee, LeaveType, Department, Notification, User, AuditLog, LeaveRequestApproval } from '../models';
 import { AuthRequest } from '../middleware/auth';
 import { sendLeaveNotificationEmail } from '../utils/email';
-import LeavePolicy from '../models/LeavePolicy';
 import { Employee as EmployeeModel } from '../models';
 import { parsePagination, buildPaginationMeta } from '../utils/pagination';
 import { ROLES } from '../utils/roles';
@@ -105,37 +104,6 @@ export const createLeaveRequest = async (req: AuthRequest, res: Response): Promi
     if (!employee) {
       res.status(404).json({ message: 'Employee profile not found.' });
       return;
-    }
-
-    // Check leave policy rules
-    const leavePolicy = await LeavePolicy.findOne({
-      where: { leaveTypeId: parseInt(leaveTypeId), isActive: true },
-    });
-
-    if (leavePolicy) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const diffTime = Math.abs(end.getTime() - start.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-      // Check max consecutive days
-      if (diffDays > leavePolicy.maxConsecutiveDays) {
-        res.status(400).json({
-          message: `Leave cannot exceed ${leavePolicy.maxConsecutiveDays} consecutive days for this leave type.`,
-        });
-        return;
-      }
-
-      // Check minimum notice period
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const noticeDiff = Math.ceil((start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      if (noticeDiff < leavePolicy.minNoticeDays) {
-        res.status(400).json({
-          message: `This leave type requires at least ${leavePolicy.minNoticeDays} day(s) advance notice.`,
-        });
-        return;
-      }
     }
 
     // Check for overlapping leave
@@ -752,73 +720,4 @@ export const levelApproveLeaveRequest = async (req: AuthRequest, res: Response):
   }
 };
 
-// GET /api/leave-requests/calendar
-export const getLeaveRequestCalendar = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const currentYear = new Date().getFullYear();
-    const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
 
-    const startDate = `${currentYear}-${String(month).padStart(2, '0')}-01`;
-    const endDate = new Date(currentYear, month, 0).toISOString().split('T')[0];
-
-    const whereClause: any = {
-      status: { [Op.in]: ['approved', 'pending'] },
-      startDate: { [Op.lte]: endDate },
-      endDate: { [Op.gte]: startDate },
-    };
-
-    // For team calendar view, show all approved/pending leaves
-    const teamView = req.query.team === 'true';
-
-    if (teamView && req.user?.role === 'employee') {
-      // Employees see their own leaves plus their colleagues'
-      const emp = await Employee.findOne({
-        where: { userId: req.user.userId },
-        include: [{ model: Employee, as: 'subordinates', attributes: ['id'] }],
-      });
-      if (emp) {
-        // For team view, show all employees from the same department
-        const deptEmployees = await Employee.findAll({
-          where: { departmentId: emp.departmentId, deletedAt: null as null } as Record<string, unknown>,
-          attributes: ['id'],
-        });
-        whereClause.employeeId = { [Op.in]: deptEmployees.map((e) => e.id) };
-      }
-    } else if (!teamView && req.user?.role === 'employee') {
-      // Default: only show their own leaves (dashboard/apply page)
-      const emp = await Employee.findOne({ where: { userId: req.user.userId } });
-      if (emp) whereClause.employeeId = emp.id;
-    }
-
-    const leaves = await LeaveRequest.findAll({
-      where: whereClause,
-      include: [
-        { model: Employee, as: 'employee', attributes: ['firstName', 'lastName', 'employeeId'] },
-        { model: LeaveType, as: 'leaveType', attributes: ['name', 'color'] },
-      ],
-      order: [['startDate', 'ASC']],
-    });
-
-    const events = leaves.map((lr: any) => ({
-      id: String(lr.id),
-      title: lr.employee
-        ? `${lr.employee.firstName} ${lr.employee.lastName} - ${lr.leaveType?.name}`
-        : `${lr.leaveType?.name}`,
-      start: lr.startDate,
-      end: lr.endDate,
-      backgroundColor: lr.status === 'approved' ? (lr.leaveType?.color || '#3B82F6') : '#F59E0B',
-      borderColor: lr.status === 'approved' ? (lr.leaveType?.color || '#3B82F6') : '#F59E0B',
-      textColor: '#FFFFFF',
-      extendedProps: {
-        status: lr.status,
-        employeeName: lr.employee ? `${lr.employee.firstName} ${lr.employee.lastName}` : '',
-        leaveType: lr.leaveType?.name,
-      },
-    }));
-
-    res.json({ events });
-  } catch (error) {
-    logger.error('Calendar error:', { error: (error as Error).message });
-    res.status(500).json({ message: 'Failed to fetch calendar events.' });
-  }
-};

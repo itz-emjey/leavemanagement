@@ -14,9 +14,6 @@ export const CacheKeys = {
   DEPARTMENTS: 'departments',
   HOLIDAYS: (year: number) => `holidays:${year}`,
   UPCOMING_HOLIDAYS: 'holidays:upcoming',
-  LEAVE_POLICIES: 'leave_policies',
-  LEAVE_PATTERNS: (employeeId?: number) =>
-    employeeId ? `leave_patterns:${employeeId}` : 'leave_patterns',
   DASHBOARD_ADMIN: 'dashboard:admin',
   DASHBOARD_EMPLOYEE: (empId: number) => `dashboard:employee:${empId}`,
   ANALYTICS_OVERVIEW: (year: number) => `analytics:overview:${year}`,
@@ -24,8 +21,6 @@ export const CacheKeys = {
     `analytics:trends:${year}:${deptId || 'all'}`,
   ANALYTICS_EMPLOYEES: (year: number) => `analytics:employees:${year}`,
   ANALYTICS_UTILIZATION: (year: number) => `analytics:utilization:${year}`,
-  CALENDAR_EXPORT: (year: number, empId?: number) =>
-    `calendar:export:${year}:${empId || 'all'}`,
 } as const;
 
 // ── In-memory store ───────────────────────────────────────────

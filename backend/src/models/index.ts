@@ -8,11 +8,9 @@ import LeaveRequest from './LeaveRequest';
 import Notification from './Notification';
 import AuditLog from './AuditLog';
 import Holiday from './Holiday';
-import LeavePolicy from './LeavePolicy';
 import LeaveRequestApproval from './LeaveRequestApproval';
 import Permission from './Permission';
 import SystemConfig from './SystemConfig';
-import LeavePattern from './LeavePattern';
 
 // Role -> User
 Role.hasMany(User, { foreignKey: 'roleId', as: 'users' });
@@ -58,10 +56,6 @@ Notification.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(AuditLog, { foreignKey: 'userId', as: 'auditLogs' });
 AuditLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-// LeaveType -> LeavePolicy
-LeaveType.hasOne(LeavePolicy, { foreignKey: 'leaveTypeId', as: 'policy' });
-LeavePolicy.belongsTo(LeaveType, { foreignKey: 'leaveTypeId', as: 'leaveType' });
-
 // LeaveRequest -> LeaveRequestApproval
 LeaveRequest.hasMany(LeaveRequestApproval, { foreignKey: 'leaveRequestId', as: 'approvals' });
 LeaveRequestApproval.belongsTo(LeaveRequest, { foreignKey: 'leaveRequestId', as: 'leaveRequest' });
@@ -74,14 +68,6 @@ LeaveRequestApproval.belongsTo(Employee, { foreignKey: 'approverId', as: 'approv
 Role.hasMany(Permission, { foreignKey: 'roleId', as: 'permissions' });
 Permission.belongsTo(Role, { foreignKey: 'roleId', as: 'role' });
 
-// Employee -> LeavePattern
-Employee.hasMany(LeavePattern, { foreignKey: 'employeeId', as: 'leavePatterns' });
-LeavePattern.belongsTo(Employee, { foreignKey: 'employeeId', as: 'employee' });
-
-// LeaveType -> LeavePattern
-LeaveType.hasMany(LeavePattern, { foreignKey: 'leaveTypeId', as: 'leavePatterns' });
-LeavePattern.belongsTo(LeaveType, { foreignKey: 'leaveTypeId', as: 'leaveType' });
-
 export {
   Role,
   Department,
@@ -93,9 +79,7 @@ export {
   Notification,
   AuditLog,
   Holiday,
-  LeavePolicy,
   LeaveRequestApproval,
   Permission,
-  LeavePattern,
   SystemConfig,
 };

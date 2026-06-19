@@ -21,8 +21,6 @@ import {
   ChevronDown,
   Search,
   CreditCard,
-  CalendarRange,
-  Clock,
   Wrench,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -42,12 +40,9 @@ const sidebarLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, adminOnly: false },
   { to: '/apply-leave', label: 'Apply Leave', icon: Send, adminOnly: false },
   { to: '/leave-requests', label: 'Leave Requests', icon: CalendarCheck, adminOnly: false },
-  { to: '/team-calendar', label: 'Team Calendar', icon: CalendarRange, adminOnly: false },
-  { to: '/leave-patterns', label: 'Leave Patterns', icon: Clock, adminOnly: false },
   { to: '/employees', label: 'Employees', icon: Users, adminOnly: true },
   { to: '/leave-credits', label: 'Leave Credits', icon: CreditCard, adminOnly: true },
   { to: '/leave-types', label: 'Leave Types', icon: FileText, adminOnly: true },
-  { to: '/leave-policies', label: 'Leave Policies', icon: Shield, adminOnly: true },
   { to: '/departments', label: 'Departments', icon: Users, adminOnly: true },
   { to: '/analytics', label: 'Analytics', icon: BarChart3, adminOnly: true },
   { to: '/reports', label: 'Reports', icon: BarChart3, adminOnly: false },
@@ -79,8 +74,6 @@ const pageTitles: Record<string, string> = {
   '/leave-requests': 'Leave Requests',
   '/reports': 'Reports',
   '/employee-statement': 'Employee Statement',
-  '/team-calendar': 'Team Calendar',
-  '/leave-patterns': 'Leave Patterns',
   '/analytics': 'Analytics',
   '/employees': 'Employees',
   '/leave-credits': 'Leave Credits',
@@ -88,7 +81,6 @@ const pageTitles: Record<string, string> = {
   '/departments': 'Departments',
   '/holidays': 'Holidays',
   '/audit-logs': 'Audit Logs',
-  '/leave-policies': 'Leave Policies',
   '/permissions': 'Role Permissions',
   '/admin/system-config': 'System Configuration',
 };
@@ -212,9 +204,7 @@ export default function DashboardLayout() {
     if ('audit'.includes(q)) suggestions.push({ label: 'Go to Audit Logs', to: '/audit-logs', icon: '🔍' });
     if ('leave credits'.includes(q) || 'credits'.includes(q) || 'balance'.includes(q)) suggestions.push({ label: 'Go to Leave Credits', to: '/leave-credits', icon: '💰' });
     if ('leave types'.includes(q) || 'types'.includes(q)) suggestions.push({ label: 'Go to Leave Types', to: '/leave-types', icon: '📝' });
-    if ('leave policies'.includes(q) || 'policies'.includes(q)) suggestions.push({ label: 'Go to Leave Policies', to: '/leave-policies', icon: '🔒' });
     if ('apply'.includes(q)) suggestions.push({ label: 'Apply for Leave', to: '/apply-leave', icon: '✈️' });
-    if ('calendar'.includes(q) || 'team'.includes(q)) suggestions.push({ label: 'Team Calendar', to: '/team-calendar', icon: '📅' });
     // Always add a general search option
     suggestions.push({ label: `Search "${searchQuery.trim()}" in Employees`, to: `/employees?search=${encodeURIComponent(searchQuery.trim())}`, icon: '🔎' });
     suggestions.push({ label: `Search "${searchQuery.trim()}" in Leave Requests`, to: `/leave-requests?search=${encodeURIComponent(searchQuery.trim())}`, icon: '🔎' });

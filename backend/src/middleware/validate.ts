@@ -163,44 +163,6 @@ export const schemas = {
     type: z.enum(['public', 'company', 'optional']).optional(),
   }),
 
-  createLeavePolicy: z.object({
-    leaveTypeId: z.union([z.string(), z.number()]).transform(Number),
-    maxConsecutiveDays: z.union([z.string(), z.number()]).transform(Number).optional().default(15),
-    minNoticeDays: z.union([z.string(), z.number()]).transform(Number).optional().default(1),
-    carryOverLimit: z.union([z.string(), z.number()]).transform(Number).optional().default(5),
-    requiresApproval: z.boolean().optional().default(true),
-    isActive: z.boolean().optional().default(true),
-  }),
-
-  updateLeavePolicy: z.object({
-    maxConsecutiveDays: z.union([z.string(), z.number()]).transform(Number).optional(),
-    minNoticeDays: z.union([z.string(), z.number()]).transform(Number).optional(),
-    carryOverLimit: z.union([z.string(), z.number()]).transform(Number).optional(),
-    requiresApproval: z.boolean().optional(),
-    isActive: z.boolean().optional(),
-  }),
-
-  createLeavePattern: z.object({
-    leaveTypeId: z.union([z.string(), z.number()]).transform(Number),
-    frequency: z.enum(['weekly', 'biweekly', 'monthly']),
-    dayOfWeek: z.union([z.string(), z.number()]).transform(Number),
-    weekOfMonth: z.union([z.string(), z.number()]).transform(Number).optional(),
-    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
-    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional(),
-    reason: z.string().optional(),
-    employeeId: z.union([z.string(), z.number()]).transform(Number).optional(),
-  }),
-
-  updateLeavePattern: z.object({
-    frequency: z.enum(['weekly', 'biweekly', 'monthly']).optional(),
-    dayOfWeek: z.union([z.string(), z.number()]).transform(Number).optional(),
-    weekOfMonth: z.union([z.string(), z.number()]).transform(Number).optional(),
-    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional(),
-    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').nullable().optional(),
-    status: z.enum(['active', 'paused', 'expired']).optional(),
-    reason: z.string().optional(),
-  }),
-
   updatePermission: z.object({
     roleId: z.union([z.string(), z.number()]).transform(Number),
     resource: z.string().min(1, 'Resource is required'),

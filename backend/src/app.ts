@@ -20,13 +20,10 @@ import auditLogRoutes from './routes/auditLogRoutes';
 import holidayRoutes from './routes/holidayRoutes';
 import leaveTypeRoutes from './routes/leaveTypeRoutes';
 import departmentRoutes from './routes/departmentRoutes';
-import leavePolicyRoutes from './routes/leavePolicyRoutes';
 import leaveRequestApprovalRoutes from './routes/leaveRequestApprovalRoutes';
 import permissionRoutes from './routes/permissionRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 import systemConfigRoutes from './routes/systemConfigRoutes';
-import calendarRoutes from './routes/calendarRoutes';
-import leavePatternRoutes from './routes/leavePatternRoutes';
 import { errorHandler } from './utils/AppError';
 import { csrfProtection } from './middleware/auth';
 import swaggerUi from 'swagger-ui-express';
@@ -262,13 +259,10 @@ app.use('/api/audit-logs', auditLogRoutes);
 app.use('/api/holidays', holidayRoutes);
 app.use('/api/leave-types', leaveTypeRoutes);
 app.use('/api/departments', departmentRoutes);
-app.use('/api/leave-policies', leavePolicyRoutes);
 app.use('/api/leave-request-approvals', leaveRequestApprovalRoutes);
 app.use('/api/permissions', permissionRoutes);
 app.use('/api/system-config', systemConfigRoutes);
-app.use('/api/calendar', calendarRoutes);
 app.use('/api/analytics', analyticsRoutes);
-app.use('/api/leave-patterns', leavePatternRoutes);
 
 // Sentry error handler (must be before the generic error handler)
 if (config.sentry.dsn) {

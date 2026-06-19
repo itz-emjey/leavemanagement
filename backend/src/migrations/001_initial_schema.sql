@@ -181,22 +181,6 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   CONSTRAINT `fk_audit_logs_user` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Leave Policies table (added in Phase 6)
-CREATE TABLE IF NOT EXISTS `leave_policies` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `leaveTypeId` INT UNSIGNED NOT NULL,
-  `maxConsecutiveDays` INT NOT NULL DEFAULT 15,
-  `minNoticeDays` INT NOT NULL DEFAULT 1,
-  `carryOverLimit` INT NOT NULL DEFAULT 5,
-  `requiresApproval` TINYINT(1) NOT NULL DEFAULT 1,
-  `isActive` TINYINT(1) NOT NULL DEFAULT 1,
-  `accrualRule` ENUM('none', 'monthly', 'quarterly', 'yearly') DEFAULT 'none',
-  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_leave_policies_leave_type` FOREIGN KEY (`leaveTypeId`) REFERENCES `leave_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Leave Request Approvals table (added in Phase 6)
 CREATE TABLE IF NOT EXISTS `leave_request_approvals` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -227,27 +211,6 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `idx_permissions_role_resource` (`roleId`, `resource`, `action`),
   CONSTRAINT `fk_permissions_role` FOREIGN KEY (`roleId`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Leave Patterns table (added in Phase 6)
-CREATE TABLE IF NOT EXISTS `leave_patterns` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `employeeId` INT UNSIGNED NOT NULL,
-  `leaveTypeId` INT UNSIGNED NOT NULL,
-  `frequency` ENUM('weekly', 'biweekly', 'monthly') NOT NULL,
-  `dayOfWeek` TINYINT UNSIGNED NOT NULL,
-  `weekOfMonth` TINYINT UNSIGNED DEFAULT NULL,
-  `startDate` DATE NOT NULL,
-  `endDate` DATE DEFAULT NULL,
-  `status` ENUM('active', 'paused', 'cancelled') DEFAULT 'active',
-  `reason` TEXT DEFAULT NULL,
-  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  INDEX `idx_leave_patterns_employee` (`employeeId`),
-  INDEX `idx_leave_patterns_status` (`status`),
-  CONSTRAINT `fk_leave_patterns_employee` FOREIGN KEY (`employeeId`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_leave_patterns_leave_type` FOREIGN KEY (`leaveTypeId`) REFERENCES `leave_types` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- System Configs table

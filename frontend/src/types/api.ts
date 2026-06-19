@@ -167,20 +167,6 @@ export interface LeaveRequestFormData {
   attachment?: File | null;
 }
 
-// ─── Leave Policy Types ──────────────────────────────────────────────
-
-export interface LeavePolicy {
-  id: number;
-  leaveTypeId: number;
-  maxConsecutiveDays: number;
-  minNoticeDays: number;
-  carryOverLimit: number;
-  requiresApproval: boolean;
-  isActive: boolean;
-  accrualRule: 'none' | 'monthly' | 'quarterly' | 'yearly';
-  leaveType?: LeaveType;
-}
-
 // ─── Holiday Types ───────────────────────────────────────────────────
 
 export interface Holiday {
@@ -303,23 +289,6 @@ export interface SystemConfig {
   description?: string;
   type: 'string' | 'number' | 'boolean' | 'json';
   group: 'general' | 'leave' | 'email' | 'system';
-}
-
-// ─── Leave Pattern Types ─────────────────────────────────────────────
-
-export interface LeavePattern {
-  id: number;
-  employeeId: number;
-  leaveTypeId: number;
-  frequency: 'weekly' | 'biweekly' | 'monthly';
-  dayOfWeek: number;
-  weekOfMonth?: number;
-  startDate: string;
-  endDate?: string;
-  status: 'active' | 'paused' | 'cancelled';
-  reason?: string;
-  employee?: EmployeeBrief;
-  leaveType?: LeaveType;
 }
 
 // ─── Calendar Types ──────────────────────────────────────────────────

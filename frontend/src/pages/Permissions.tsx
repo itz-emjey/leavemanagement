@@ -29,7 +29,6 @@ const resourceLabels: Record<string, string> = {
   leave_types: 'Leave Types',
   departments: 'Departments',
   holidays: 'Holidays',
-  leave_policies: 'Leave Policies',
   leave_credits: 'Leave Credits',
   reports: 'Reports & Analytics',
   audit_logs: 'Audit Logs',
