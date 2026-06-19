@@ -30,27 +30,27 @@ export default function LeavePrintForm({ request: req }: LeavePrintFormProps) {
   return (
     <div className="w-full max-w-4xl mx-auto bg-white text-black p-4 md:p-8 font-sans h-full">
       {/* Header */}
-      <div className="flex items-center mb-6 relative">
-        <div className="absolute left-0 top-0 lg:-left-4 lg:-top-4 w-28 h-28 flex items-center justify-center bg-white z-10">
-          {/* Logo Placeholder - Falls back automatically if missing */}
+      <div className="flex items-center mb-6">
+        <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 flex items-center justify-center bg-white print:w-[100px] print:h-[100px] print:block">
+          {/* Logo - Uses standard img tag layout to ensure print rendering */}
           <img 
             src="/logo.png" 
             alt="SLRC Logo" 
-            className="w-full h-full object-contain" 
+            className="w-full h-full object-contain print:max-h-[100px]" 
             onError={(e) => {
               e.currentTarget.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="black" stroke-width="2" fill="none"/><text x="50" y="55" font-size="14" text-anchor="middle" fill="black">LOGO</text></svg>';
             }} 
           />
         </div>
         
-        <div className="flex-1 text-center pl-24 lg:pl-0">
-          <h1 className="text-[1.35rem] font-bold uppercase tracking-wide">
+        <div className="flex-1 text-center pr-24 sm:pr-28 print:pr-[100px]">
+          <h1 className="text-[1.1rem] sm:text-[1.35rem] font-bold uppercase tracking-wide print:text-[16pt]">
             San Lorenzo Ruiz College of Ormoc, Inc.
           </h1>
-          <p className="text-[13px] my-1">
+          <p className="text-[12px] sm:text-[13px] my-1 print:text-[10pt]">
             Brgy. San Pablo, Ormoc City
           </p>
-          <h2 className="text-xl font-bold uppercase mt-6 tracking-widest">
+          <h2 className="text-lg sm:text-xl font-bold uppercase mt-2 sm:mt-6 tracking-widest print:text-[14pt] print:mt-4">
             Request For Leave
           </h2>
         </div>
