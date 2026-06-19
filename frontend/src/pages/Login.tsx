@@ -34,6 +34,14 @@ export default function Login() {
       await login(data.email, data.password);
       navigate('/dashboard');
     } catch (err: any) {
+      console.debug('[Login] Error:', {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        headers: err.response?.headers,
+        config: err.config ? { url: err.config.url, method: err.config.method, baseURL: err.config.baseURL } : undefined,
+      });
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setIsSubmitting(false);
