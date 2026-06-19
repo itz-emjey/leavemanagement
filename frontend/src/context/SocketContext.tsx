@@ -81,7 +81,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const socketUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
     const currentUserId = user.id;
 
     function connect() {
