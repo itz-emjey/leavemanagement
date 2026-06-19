@@ -1,5 +1,9 @@
 /// <reference types="vite/client" />
 
+interface Window {
+  API_URL?: string;
+}
+
 // Type declarations for vite-plugin-pwa virtual modules
 // This module is provided at build time by vite-plugin-pwa
 declare module 'virtual:pwa-register/react' {
