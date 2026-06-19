@@ -2,7 +2,7 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import app from './app';
 import config from './config/constants';
-import { testConnection } from './config/database';
+import sequelize, { testConnection } from './config/database';
 import { logger } from './utils/logger';
 import { initCronJobs } from './utils/cron';
 
@@ -36,6 +36,8 @@ io.on('connection', (socket) => {
 const startServer = async () => {
   try {
     await testConnection();
+    // Auto-sync model schema (adds missing columns/tables without dropping data)
+    await sequelize.sync({ alter: true });
     logger.info('Database synced successfully.');
   } catch (error) {
     logger.warn('Database connection failed. Server will start without DB:', { error: String(error) });

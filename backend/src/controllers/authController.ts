@@ -93,6 +93,7 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
               employeeId: userEmployee.employeeId,
               position: userEmployee.position,
               profilePicture: userEmployee.profilePicture,
+              signature: userEmployee.signature || null,
             }
           : null,
       },
