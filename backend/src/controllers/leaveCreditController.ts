@@ -49,10 +49,10 @@ export const adjustLeaveCredit = async (req: AuthRequest, res: Response): Promis
     });
 
     if (balance) {
-      const diff = allocated - balance.allocated;
+      const diff = Number(allocated) - Number(balance.allocated);
       await balance.update({
         allocated,
-        remaining: balance.remaining + diff,
+        remaining: Number(balance.remaining) + diff,
       });
     } else {
       balance = await LeaveBalance.create({
@@ -120,7 +120,7 @@ export const bulkAdjustLeaveCredits = async (req: AuthRequest, res: Response): P
         });
 
         if (balance) {
-          const diff = Number(allocated) - balance.allocated;
+          const diff = Number(allocated) - Number(balance.allocated);
           await balance.update({
             allocated: Number(allocated),
             remaining: Number(balance.remaining) + diff,
