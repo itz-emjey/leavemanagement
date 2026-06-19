@@ -25,6 +25,7 @@ import permissionRoutes from './routes/permissionRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 import systemConfigRoutes from './routes/systemConfigRoutes';
 import { errorHandler } from './utils/AppError';
+import { getDeploymentInfo } from './utils/deploymentInfo';
 import { csrfProtection } from './middleware/auth';
 import swaggerUi from 'swagger-ui-express';
 import { openApiSpec } from './docs/swagger';
@@ -217,6 +218,11 @@ app.get('/api/health', async (_req, res) => {
       heapUsed: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB`,
     },
   });
+});
+
+// Deployment info endpoint — used by frontend to detect new deployments
+app.get('/api/deployment', (_req, res) => {
+  res.json(getDeploymentInfo());
 });
 
 // Application metrics endpoint (for prometheus-style monitoring)
