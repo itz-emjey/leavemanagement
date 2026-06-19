@@ -267,7 +267,7 @@ export const getEmployeeLeaveStatement = async (req: AuthRequest, res: Response)
 
     const employee = await Employee.findByPk(employeeId, {
       include: [{ model: Department, as: 'department', attributes: ['name'] }],
-      attributes: ['id', 'firstName', 'lastName', 'employeeId', 'position', 'email', 'hireDate'],
+      attributes: ['id', 'firstName', 'lastName', 'employeeId', 'position', 'email', 'hireDate', 'signature']),
     });
 
     if (!employee) {

@@ -65,7 +65,7 @@ export const getLeaveRequests = async (req: AuthRequest, res: Response): Promise
         {
           model: Employee, as: 'employee',
           where: Object.keys(employeeWhere).length > 1 ? employeeWhere : undefined,
-          attributes: ['id', 'firstName', 'lastName', 'employeeId'],
+          attributes: ['id', 'firstName', 'lastName', 'employeeId', 'signature'],
           include: [{ model: Department, as: 'department', attributes: ['name'] }],
         },
         { model: LeaveType, as: 'leaveType', attributes: ['id', 'name', 'color'] },

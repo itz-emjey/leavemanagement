@@ -15,6 +15,7 @@ interface StatementData {
     email: string;
     hireDate: string;
     department?: { name: string };
+    signature?: string;
   };
   year: number;
   leaveRequests: {
@@ -154,6 +155,12 @@ export default function EmployeeStatement() {
           <div className="text-right">
             <p className="text-3xl font-bold text-[#5B5FEF]">{data.totalDaysTaken}</p>
             <p className="text-xs text-gray-400">Days Taken ({year})</p>
+            {data.employee?.signature && (
+              <div className="text-right mt-2">
+                <p className="text-xs text-gray-400 mb-1">Employee Signature</p>
+                <img src={data.employee.signature} alt="Signature" className="h-8 object-contain ml-auto" />
+              </div>
+            )}
           </div>
         </div>
       </div>

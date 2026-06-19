@@ -24,6 +24,7 @@ interface LeaveRequest {
     employeeId: string;
     department?: { name: string };
     position?: string;
+    signature?: string;
   };
   leaveType: {
     id: number;
@@ -365,3 +366,4 @@ export default function LeaveRequests() {
     </div>
   );
 }
+

@@ -204,10 +204,15 @@ export default function LeavePrintForm({ request: req }: LeavePrintFormProps) {
           <tbody>
             <tr>
               <td className="border border-black h-[100px] align-bottom p-0 relative">
-                <div className="px-2 mb-[30px] font-bold uppercase truncate" title={name}>
+                {req?.employee?.signature && (
+                  <div className="absolute top-2 left-0 w-full flex justify-center opacity-80 z-0">
+                    <img src={req.employee.signature} alt="Signature" className="h-12 object-contain" />
+                  </div>
+                )}
+                <div className="px-2 mb-[30px] font-bold uppercase truncate z-10 relative" title={name}>
                   {name}
                 </div>
-                <div className="border-t border-black px-2 py-1 truncate absolute bottom-0 w-full bg-white">
+                <div className="border-t border-black px-2 py-1 truncate absolute bottom-0 w-full bg-white z-10">
                   Signiture over Printed Name
                 </div>
               </td>
