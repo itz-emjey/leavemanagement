@@ -26,6 +26,13 @@ interface StatementData {
     duration: number;
     status: string;
     reason?: string;
+    approver?: {
+      id: number;
+      firstName: string;
+      lastName: string;
+      position: string;
+      signature?: string;
+    } | null;
   }[];
   balances: {
     leaveType: string;
@@ -192,13 +199,14 @@ export default function EmployeeStatement() {
                 <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">End Date</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Days</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Status</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Approved By</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Reason</th>
               </tr>
             </thead>
             <tbody>
               {data.leaveRequests.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-gray-400">No leave records found.</td>
+                  <td colSpan={7} className="text-center py-12 text-gray-400">No leave records found.</td>
                 </tr>
               ) : (
                 data.leaveRequests.map((lr) => (
@@ -216,6 +224,26 @@ export default function EmployeeStatement() {
                       <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium border', statusStyles[lr.status])}>
                         {lr.status.charAt(0).toUpperCase() + lr.status.slice(1)}
                       </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      {lr.status === 'approved' && lr.approver ? (
+                        <div className="flex items-center gap-2">
+                          {lr.approver.signature ? (
+                            <img src={lr.approver.signature} alt="Signature" className="h-6 object-contain" />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-[#5B5FEF]/10 flex items-center justify-center flex-shrink-0">
+                              <span className="text-[9px] font-bold text-[#5B5FEF]">
+                                {lr.approver.firstName?.[0]}{lr.approver.lastName?.[0]}
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-xs text-gray-600">
+                            {lr.approver.firstName} {lr.approver.lastName}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
                     </td>
                     <td className="py-3 px-4 text-gray-500 text-xs max-w-[200px] truncate">{lr.reason || '—'}</td>
                   </tr>

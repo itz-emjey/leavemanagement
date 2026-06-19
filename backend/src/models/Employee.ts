@@ -14,12 +14,13 @@ interface EmployeeAttributes {
   phone?: string;
   hireDate: Date;
   profilePicture?: string;
+  signature?: string;
   managerId?: number;
   deletedAt?: Date;
   dateOfBirth?: string;
 }
 
-interface EmployeeCreationAttributes extends Optional<EmployeeAttributes, 'id' | 'profilePicture' | 'phone' | 'managerId' | 'deletedAt' | 'dateOfBirth'> {}
+interface EmployeeCreationAttributes extends Optional<EmployeeAttributes, 'id' | 'profilePicture' | 'signature' | 'phone' | 'managerId' | 'deletedAt' | 'dateOfBirth'> {}
 
 class Employee extends Model<EmployeeAttributes, EmployeeCreationAttributes> implements EmployeeAttributes {
   public id!: number;
@@ -33,6 +34,7 @@ class Employee extends Model<EmployeeAttributes, EmployeeCreationAttributes> imp
   public phone?: string;
   public hireDate!: Date;
   public profilePicture?: string;
+  public signature?: string;
   public managerId?: number;
   public deletedAt?: Date;
   public dateOfBirth?: string;
@@ -92,6 +94,10 @@ Employee.init(
     },
     profilePicture: {
       type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    signature: {
+      type: DataTypes.TEXT('long'),
       allowNull: true,
     },
     managerId: {

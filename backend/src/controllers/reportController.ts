@@ -281,7 +281,10 @@ export const getEmployeeLeaveStatement = async (req: AuthRequest, res: Response)
         employeeId,
         startDate: { [Op.gte]: `${year}-01-01`, [Op.lte]: `${year}-12-31` },
       },
-      include: [{ model: LeaveType, as: 'leaveType', attributes: ['name', 'color'] }],
+      include: [
+        { model: LeaveType, as: 'leaveType', attributes: ['name', 'color'] },
+        { model: Employee, as: 'approver', attributes: ['id', 'firstName', 'lastName', 'position', 'signature'] },
+      ],
       order: [['startDate', 'DESC']],
     });
 
@@ -299,6 +302,7 @@ export const getEmployeeLeaveStatement = async (req: AuthRequest, res: Response)
       year,
       leaveRequests: leaveRequests.map((lr) => {
         const lt = lr.get('leaveType') as { name: string; color: string } | undefined;
+        const approver = lr.get('approver') as { id: number; firstName: string; lastName: string; position: string; signature?: string } | undefined;
         return {
           id: lr.id,
           leaveType: lt?.name || null,
@@ -308,6 +312,15 @@ export const getEmployeeLeaveStatement = async (req: AuthRequest, res: Response)
           duration: lr.duration,
           status: lr.status,
           reason: lr.reason,
+          approver: approver
+            ? {
+                id: approver.id,
+                firstName: approver.firstName,
+                lastName: approver.lastName,
+                position: approver.position,
+                signature: approver.signature || null,
+              }
+            : null,
         };
       }),
       balances: balances.map((lb) => {

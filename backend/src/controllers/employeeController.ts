@@ -415,3 +415,43 @@ export const resetEmployeePassword = async (req: AuthRequest, res: Response): Pr
     res.status(500).json({ message: 'Failed to reset password.' });
   }
 };
+
+// PATCH /api/employees/signature
+export const updateSignature = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { signature } = req.body;
+
+    if (!signature || typeof signature !== 'string') {
+      res.status(400).json({ message: 'Signature image data is required.' });
+      return;
+    }
+
+    if (!signature.startsWith('data:image/')) {
+      res.status(400).json({ message: 'Invalid signature format. Must be a base64 image.' });
+      return;
+    }
+
+    // Max 500KB for signature image
+    const sizeInBytes = Math.ceil((signature.length * 3) / 4);
+    if (sizeInBytes > 500 * 1024) {
+      res.status(400).json({ message: 'Signature image must be under 500KB.' });
+      return;
+    }
+
+    const employee = await Employee.findOne({ where: { userId: req.user!.userId } });
+    if (!employee) {
+      res.status(404).json({ message: 'Employee profile not found.' });
+      return;
+    }
+
+    await employee.update({ signature });
+
+    res.json({
+      message: 'Signature updated successfully.',
+      signature: employee.signature,
+    });
+  } catch (error) {
+    logger.error('Update signature error:', { error: (error as Error).message });
+    res.status(500).json({ message: 'Failed to update signature.' });
+  }
+};

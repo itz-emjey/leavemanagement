@@ -72,7 +72,7 @@ export const getLeaveRequests = async (req: AuthRequest, res: Response): Promise
         { model: LeaveType, as: 'leaveType', attributes: ['id', 'name', 'color'] },
         {
           model: Employee, as: 'approver',
-          attributes: ['id', 'firstName', 'lastName'],
+          attributes: ['id', 'firstName', 'lastName', 'position', 'signature'],
         },
       ],
       order: [['createdAt', 'DESC']],

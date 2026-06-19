@@ -75,7 +75,7 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
 
     const userEmployee = user.get('employee') as {
       id: number; firstName: string; lastName: string;
-      employeeId: string; position: string; profilePicture?: string;
+      employeeId: string; position: string; profilePicture?: string; signature?: string;
     } | undefined;
 
     res.json({

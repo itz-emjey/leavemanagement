@@ -8,6 +8,7 @@ interface Employee {
   employeeId: string;
   position: string;
   profilePicture?: string;
+  signature?: string;
 }
 
 interface User {

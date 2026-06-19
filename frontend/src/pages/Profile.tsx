@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import api from '@/lib/axios';
-import { User, Save, Lock, Upload, Camera } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { User, Save, Lock, Upload, Camera, Pen, Trash2 } from 'lucide-react';
 
 const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -34,6 +35,58 @@ export default function Profile() {
   const [profilePicPreview, setProfilePicPreview] = useState<string | null>(user?.employee?.profilePicture || null);
   const [uploadingPic, setUploadingPic] = useState(false);
   const [picMessage, setPicMessage] = useState('');
+
+  const [sigFile, setSigFile] = useState<File | null>(null);
+  const [sigPreview, setSigPreview] = useState<string | null>(user?.employee?.signature || null);
+  const [uploadingSig, setUploadingSig] = useState(false);
+  const [sigMessage, setSigMessage] = useState('');
+  const [sigMessageType, setSigMessageType] = useState<'success' | 'error'>('success');
+
+  const handleSignatureFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSigFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setSigPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+    setSigMessage('');
+  };
+
+  const handleUploadSignature = async () => {
+    if (!sigFile) return;
+    setUploadingSig(true);
+    setSigMessage('');
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => resolve(ev.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(sigFile);
+      });
+      await api.patch('/employees/signature', { signature: base64 });
+      setSigMessage('Signature uploaded successfully.');
+      setSigMessageType('success');
+      setSigFile(null);
+    } catch (err: any) {
+      setSigMessage(err.response?.data?.message || 'Failed to upload signature.');
+      setSigMessageType('error');
+    } finally {
+      setUploadingSig(false);
+    }
+  };
+
+  const handleClearSignature = async () => {
+    try {
+      await api.patch('/employees/signature', { signature: '' });
+      setSigPreview(null);
+      setSigFile(null);
+      setSigMessage('Signature removed.');
+      setSigMessageType('success');
+    } catch {
+      setSigMessage('Failed to remove signature.');
+      setSigMessageType('error');
+    }
+  };
 
   const profileForm = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
@@ -238,6 +291,69 @@ export default function Profile() {
               <Lock className="w-4 h-4" /> Change Password
             </button>
           </form>
+        </div>
+      </div>
+
+      {/* Digital Signature */}
+      <div className="card space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Pen className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Digital Signature</h2>
+            <p className="text-sm text-gray-500">Upload your signature for printed leave documents</p>
+          </div>
+        </div>
+
+        {sigMessage && (
+          <div className={cn('p-3 rounded-lg border text-sm', sigMessageType === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700')}>
+            {sigMessage}
+          </div>
+        )}
+
+        <div className="flex items-start gap-6 flex-wrap">
+          <div className="flex-shrink-0">
+            <p className="text-xs text-gray-500 mb-2 font-medium">Current Signature</p>
+            <div className="w-48 h-24 rounded-lg border-2 border-dashed border-[#E8ECF1] flex items-center justify-center bg-gray-50 overflow-hidden">
+              {sigPreview ? (
+                <img src={sigPreview} alt="Signature" className="max-w-full max-h-full object-contain p-2" />
+              ) : (
+                <span className="text-xs text-gray-400">No signature uploaded</span>
+              )}
+            </div>
+          </div>
+          <div className="space-y-3 flex-1 min-w-[200px]">
+            <p className="text-xs text-gray-500 mb-2 font-medium">Upload New Signature</p>
+            <label className="flex items-center gap-2 px-4 py-2.5 border border-[#E8ECF1] rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm text-gray-600">
+              <Upload className="w-4 h-4" />
+              Choose Image File
+              <input
+                type="file"
+                className="hidden"
+                accept="image/png,image/jpeg,image/gif"
+                onChange={handleSignatureFile}
+              />
+            </label>
+            <p className="text-xs text-gray-400">Accepted: PNG, JPG, GIF — Max 500KB</p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleUploadSignature}
+                disabled={uploadingSig || !sigFile}
+                className="btn-primary text-sm flex items-center gap-2 disabled:opacity-50"
+              >
+                {uploadingSig ? 'Uploading...' : <><Upload className="w-4 h-4" /> Upload Signature</>}
+              </button>
+              {sigPreview && (
+                <button
+                  onClick={handleClearSignature}
+                  className="btn-secondary text-sm flex items-center gap-2 text-red-500 hover:text-red-600"
+                >
+                  <Trash2 className="w-4 h-4" /> Remove
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

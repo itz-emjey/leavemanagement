@@ -10,6 +10,7 @@ import {
   toggleEmployeeStatus,
   resetEmployeePassword,
   bulkImportEmployees,
+  updateSignature,
 } from '../controllers/employeeController';
 import { protect } from '../middleware/auth';
 import { authorize } from '../middleware/rbac';
@@ -49,5 +50,6 @@ router.put('/:id', authorize('admin'), validate({ body: schemas.updateEmployee }
 router.delete('/:id', authorize('admin'), deleteEmployee);
 router.patch('/:id/toggle-status', authorize('admin'), toggleEmployeeStatus);
 router.post('/:id/reset-password', authorize('admin'), resetEmployeePassword);
+router.patch('/signature', updateSignature);
 
 export default router;

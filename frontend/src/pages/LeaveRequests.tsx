@@ -34,6 +34,8 @@ interface LeaveRequest {
     id: number;
     firstName: string;
     lastName: string;
+    position?: string;
+    signature?: string;
   };
 }
 
@@ -136,7 +138,7 @@ export default function LeaveRequests() {
       <head>
         <title>Leave Application - ${req.employee?.firstName} ${req.employee?.lastName}</title>
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Great+Vibes&display=swap');
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body {
             font-family: 'Inter', -apple-system, sans-serif;
@@ -213,6 +215,31 @@ export default function LeaveRequests() {
         <div class="section">
           <h3>Rejection Reason</h3>
           <div class="reason-box" style="border-color: #fecaca; background: #fef2f2; color: #991b1b;">${req.rejectionReason}</div>
+        </div>
+        ` : ''}
+
+        ${req.status === 'approved' && req.approver ? `
+        <div class="signature-section">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 8px;">
+            <div>
+              <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 12px;">Approved By</h3>
+              ${req.approver.signature ? `
+              <div style="margin-bottom: 8px;">
+                <img src="${req.approver.signature}" alt="Signature" style="max-height: 50px; max-width: 200px;" />
+              </div>
+              ` : `
+              <div style="margin-bottom: 8px; font-family: 'Great Vibes', 'Cedarville Cursive', cursive; font-size: 24px; color: #1a1a2e;">
+                ${req.approver.firstName} ${req.approver.lastName}
+              </div>
+              `}
+              <p style="font-size: 14px; color: #1a1a2e; font-weight: 600; margin: 0;">${req.approver.firstName} ${req.approver.lastName}</p>
+              <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">${req.approver.position || 'Administrator'}</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 4px 0 0 0;">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+            <div style="text-align: right;">
+              <p style="font-size: 11px; color: #94a3b8; margin: 0;">Leave Management System</p>
+            </div>
+          </div>
         </div>
         ` : ''}
 
@@ -455,6 +482,32 @@ export default function LeaveRequests() {
               <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
                 <p className="text-xs text-red-500 mb-1">Rejection Reason</p>
                 <p className="text-sm text-red-700">{selectedRequest.rejectionReason}</p>
+              </div>
+            )}
+            {selectedRequest.status === 'approved' && selectedRequest.approver && (
+              <div className="mt-4 p-3 rounded-lg bg-green-50 border border-green-200">
+                <p className="text-xs text-green-600 mb-2 font-medium">Approved By</p>
+                <div className="flex items-center gap-3">
+                  {selectedRequest.approver.signature ? (
+                    <img
+                      src={selectedRequest.approver.signature}
+                      alt="Signature"
+                      className="h-10 object-contain"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-[#5B5FEF]/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-[#5B5FEF]">
+                        {selectedRequest.approver.firstName?.[0]}{selectedRequest.approver.lastName?.[0]}
+                      </span>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedRequest.approver.firstName} {selectedRequest.approver.lastName}
+                    </p>
+                    <p className="text-xs text-gray-500">{selectedRequest.approver.position || 'Administrator'}</p>
+                  </div>
+                </div>
               </div>
             )}
             <div className="flex gap-2 mt-5">
