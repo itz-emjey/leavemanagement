@@ -50,6 +50,32 @@ export const getEmployeeDashboard = async (req: AuthRequest, res: Response): Pro
       },
     });
 
+    // Current active leave details (if on leave)
+    let currentLeave = null;
+    if (onLeave > 0) {
+      const activeLeave = await LeaveRequest.findOne({
+        where: {
+          employeeId: employee.id,
+          status: 'approved',
+          startDate: { [Op.lte]: today },
+          endDate: { [Op.gte]: today },
+        },
+        attributes: ['id', 'startDate', 'endDate', 'duration'],
+        include: [{ model: LeaveType, as: 'leaveType', attributes: ['name', 'color'] }],
+      });
+      if (activeLeave) {
+        const lt = activeLeave.get('leaveType') as { name: string; color: string } | undefined;
+        currentLeave = {
+          id: activeLeave.id,
+          leaveType: lt?.name || null,
+          leaveTypeColor: lt?.color || null,
+          startDate: activeLeave.startDate,
+          endDate: activeLeave.endDate,
+          duration: activeLeave.duration,
+        };
+      }
+    }
+
     // Leave balances
     const leaveBalances = await LeaveBalance.findAll({
       where: { employeeId: employee.id, year: currentYear },
@@ -150,6 +176,7 @@ export const getEmployeeDashboard = async (req: AuthRequest, res: Response): Pro
         createdAt: lr.createdAt,
       })),
       nextUpcomingLeave: nextUpcomingLeaveData,
+      currentLeave,
     });
   } catch (error) {
     logger.error('Employee Dashboard error', { error: String(error) });

@@ -67,6 +67,14 @@ interface DashboardData {
     endDate: string;
     duration: number;
   } | null;
+  currentLeave?: {
+    id: number;
+    leaveType: string;
+    leaveTypeColor: string;
+    startDate: string;
+    endDate: string;
+    duration: number;
+  } | null;
 }
 
 function StatCard({ icon: Icon, label, value, trend, color }: { icon: any; label: string; value: string | number; trend?: string; color: string }) {
@@ -433,6 +441,30 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Currently on leave banner */}
+      {data.currentLeave && (
+        <div className="rounded-xl border-2 border-[#5B5FEF]/20 bg-gradient-to-r from-[#5B5FEF]/5 to-purple-50 p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#5B5FEF]/10 flex items-center justify-center flex-shrink-0">
+            <CalendarCheck className="w-6 h-6 text-[#5B5FEF]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-lg font-bold text-gray-900">
+              You are currently on <span style={{ color: data.currentLeave.leaveTypeColor }}>{data.currentLeave.leaveType}</span>
+            </p>
+            <p className="text-sm text-gray-500 mt-0.5">
+              {new Date(data.currentLeave.startDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} — {new Date(data.currentLeave.endDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ({data.currentLeave.duration} day{data.currentLeave.duration > 1 ? 's' : ''})
+            </p>
+          </div>
+          <Link
+            to="/leave-requests"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#5B5FEF] text-white text-sm font-medium rounded-lg hover:bg-[#4B4FDF] transition-all flex-shrink-0"
+          >
+            View Request
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
 
       {/* Employee Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
