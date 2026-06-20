@@ -1,7 +1,8 @@
 import { Response } from 'express';
-import { LeaveType, LeaveBalance, AuditLog } from '../models';
+import { LeaveType, LeaveBalance, Employee, User, AuditLog } from '../models';
 import { AuthRequest } from '../middleware/auth';
 import { cacheGet, cacheSet, cacheDelete } from '../utils/cache';
+import { emitToUsers } from '../utils/socketEmitter';
 import { logger } from '../utils/logger';
 
 // GET /api/leave-types
@@ -55,6 +56,47 @@ export const createLeaveType = async (req: AuthRequest, res: Response): Promise<
       ipAddress: req.ip,
       userAgent: req.headers['user-agent'],
     });
+
+    // Create leave balances for all existing employees
+    const employees = await Employee.findAll({
+      include: [{ model: User, as: 'user', attributes: ['id'] }],
+    });
+    const currentYear = new Date().getFullYear();
+    const balanceData = employees.map((emp) => ({
+      employeeId: emp.id,
+      leaveTypeId: leaveType.id,
+      allocated: defaultDays,
+      used: 0,
+      remaining: defaultDays,
+      year: currentYear,
+    }));
+
+    if (balanceData.length > 0) {
+      await LeaveBalance.bulkCreate(balanceData);
+
+      const userIds = employees
+        .map((emp) => (emp.get('user') as { id: number } | undefined)?.id)
+        .filter((id): id is number => id !== undefined);
+
+      if (userIds.length > 0) {
+        emitToUsers(req, userIds, {
+          title: 'New Leave Type Available',
+          message: `${name} (${defaultDays} days) has been added to your leave balances.`,
+          type: 'info',
+          link: '/apply-leave',
+        });
+      }
+
+      await AuditLog.create({
+        userId: req.user!.userId,
+        action: 'create_balances',
+        entity: 'leave_balance',
+        entityId: leaveType.id,
+        details: `Created ${name} balances for ${balanceData.length} employees`,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+    }
 
       cacheDelete('leave_types');
     res.status(201).json(leaveType);
